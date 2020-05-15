@@ -3,7 +3,7 @@ package by.it.romanshpakovskiy.tasks.jd02_02;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Buyer extends Thread implements IBuyer, IUseBasket, Runnable {
+public class Buyer extends Thread implements IBuyer, IUseBasket {
     int buyerNum;
     boolean pensioneer;
     private final Store store;
@@ -44,37 +44,54 @@ public class Buyer extends Thread implements IBuyer, IUseBasket, Runnable {
     @Override
     public boolean enterToTheMarket() {
         int actualBuyersCount = store.enterTheStore(this);
-        return actualBuyersCount >= 0;
+        if(actualBuyersCount>=0) {
+            if (!Runner.AS_A_TABLE) System.out.println(this + " entered the store");
+            return true;
+        }
+        else {
+            if(!Runner.AS_A_TABLE) System.out.println(this + " didn't visit the store");
+            return false;
+        }
     }
 
     @Override
     public void takeBasket() {
-        if (store.getBasketsSize() == 0) {
+        if(!Runner.AS_A_TABLE) System.out.println(this + " waits for basket");
+        while (true) {
+            basket = store.getBasket();
+            if(basket != null){
+                break;
+            }
             Thread.yield();
         }
-        basket = store.getBasket(basket);
+        if(!Runner.AS_A_TABLE) System.out.println(this + " took basket");
+        sleepBuyer(500, 2000);
     }
 
     @Override
     public void chooseGoods() {
         int basketGoods = Helper.getRandomValue(1, 4);
+        if(!Runner.AS_A_TABLE) System.out.println(this + " started choosing of goods");
         for (int i = 0; i < basketGoods; i++) {
             product.add(store.getRandomGoods());
-            sleepBuyer(30, 70);
+            sleepBuyer(500, 2000);
         }
+        if(!Runner.AS_A_TABLE) System.out.println(this + " finished choosing of goods");
     }
 
     @Override
     public void putGoodsToTheBasket() {
         for (String s : product) {
             basket.putGoods(s);
-            sleepBuyer(30, 50);
+            sleepBuyer(500, 2000);
         }
+        if(!Runner.AS_A_TABLE) System.out.println(this + " put" + product + " at basket");
     }
 
     @Override
     public void getInQueue() {
-        store.inQueue(this);
+        store.enterBuyersQueue(this);
+        if (!Runner.AS_A_TABLE) System.out.println(this + " stood in queue");
         synchronized (this) {
             try {
                 wait();
@@ -82,10 +99,12 @@ public class Buyer extends Thread implements IBuyer, IUseBasket, Runnable {
                 e.printStackTrace();
             }
         }
+        sleepBuyer(500, 2000);
     }
 
     synchronized Basket getGoods() {
-        sleepBuyer(100, 200);
+        if (!Runner.AS_A_TABLE) System.out.println(this + " took goods");
+        sleepBuyer(500, 2000);
         return basket;
     }
 
@@ -93,6 +112,7 @@ public class Buyer extends Thread implements IBuyer, IUseBasket, Runnable {
     synchronized public void goOut() {
         store.putBasketBack(basket);
         store.leaveStore(this);
+        if (!Runner.AS_A_TABLE) System.out.println(this + " gone");
     }
 
     @Override

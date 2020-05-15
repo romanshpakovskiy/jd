@@ -9,14 +9,14 @@ public class Manager extends Thread {
     private boolean endWork;
     private boolean work;
 
-    boolean isWork(){
-        return work;
-    }
-
     Manager(Store store) {
         this.store = store;
         Thread thread = new Thread("Store Manager");
         thread.start();
+    }
+
+    boolean isWork(){
+        return work;
     }
 
     @Override
@@ -24,6 +24,7 @@ public class Manager extends Thread {
         synchronized (this) {
             try {
                 wait();
+                work = true;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -51,7 +52,6 @@ public class Manager extends Thread {
     }
 
     void cashiersManaging() {
-        int actualQueueSize = store.getBuyersQueueSize();
         int workingCashiers = 0;
         ArrayList<String> workingCashiersNames = new ArrayList<>();
         for (Cashier cashier : cashiers) {
@@ -61,6 +61,7 @@ public class Manager extends Thread {
             }
         }
 
+        int actualQueueSize = store.getBuyersQueueSize();
         if (necessaryCashiers(actualQueueSize) > workingCashiers) {
             while (necessaryCashiers(actualQueueSize) <= workingCashiers) {
                 for (Cashier cashier : cashiers) {

@@ -5,7 +5,6 @@ import java.util.ArrayDeque;
 public class BuyersQueue {
     private ArrayDeque<Buyer> youngGeneration;
     private ArrayDeque<Buyer> oldGeneration;
-    static final Object buyersQueueMonitor = new Object();
 
     BuyersQueue(){
         youngGeneration = new ArrayDeque<>();
@@ -13,7 +12,7 @@ public class BuyersQueue {
     }
 
     void enterQueue(Buyer buyer) {
-        synchronized (buyersQueueMonitor) {
+        synchronized (this) {
             if (buyer.isPensioner())
                 oldGeneration.add(buyer);
             else
@@ -22,7 +21,7 @@ public class BuyersQueue {
     }
 
     Buyer nextBuyer() {
-        synchronized (buyersQueueMonitor) {
+        synchronized (this) {
             if (!oldGeneration.isEmpty())
                 return oldGeneration.pollFirst();
             else
@@ -31,7 +30,7 @@ public class BuyersQueue {
     }
 
     int getSize() {
-        synchronized (buyersQueueMonitor) {
+        synchronized (this) {
             return youngGeneration.size() + oldGeneration.size();
         }
     }

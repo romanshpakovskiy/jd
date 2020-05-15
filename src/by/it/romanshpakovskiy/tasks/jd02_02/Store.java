@@ -4,17 +4,17 @@ import java.util.*;
 
 public class Store {
     private final Map<String, Double> goods;
-    List<Cashier> cashiers;
+    private List<Cashier> cashiers;
     boolean isClose;
-    Set<Buyer> buyers;
-    Set<Basket> baskets;
+    private Set<Buyer> buyers;
+    private LinkedList<Basket> baskets;
     final Manager manager;
-    BuyersQueue buyersQueue;
+    private BuyersQueue buyersQueue;
 
     public Store(int countOfTheBasket) {
         manager = new Manager(this);
         buyers = new HashSet<>();
-        baskets = new HashSet<>();
+        baskets = new LinkedList<>();
         buyersQueue = new BuyersQueue();
 
         for (int i = 0; i < countOfTheBasket; i++) {
@@ -37,18 +37,17 @@ public class Store {
         goods.put("banana", 3.2);
     }
 
-    boolean isClose() {
-        return buyers.size() == 0;
-    }
-
     Buyer getBuyer(){
         return buyersQueue.nextBuyer();
     }
 
-    synchronized Basket getBasket(Basket basket) {
+    synchronized Basket getBasket() {
         if (!baskets.isEmpty()) {
-            baskets.remove(basket);
-            return basket;
+            Basket basket = baskets.iterator().next();
+            if(basket!=null){
+                baskets.remove(basket);
+                return basket;
+            }
         }
         return null;
     }
@@ -68,13 +67,13 @@ public class Store {
         return 0;
     }
 
-    synchronized void inQueue(Buyer buyer){
+    synchronized void enterBuyersQueue(Buyer buyer){
         if(!manager.isWork()){
             synchronized (manager){
                 manager.notify();
             }
-        } else
-            buyersQueue.enterQueue(buyer);
+        }
+        buyersQueue.enterQueue(buyer);
     }
 
     synchronized int enterTheStore(Buyer buyer) {
@@ -103,11 +102,11 @@ public class Store {
         }
     }
 
-    void putBasketBack(Basket basket){
+    synchronized void putBasketBack(Basket basket){
         baskets.add(basket);
     }
 
-    int getBasketsSize(){
-        return baskets.size();
+    synchronized boolean isBasket() {
+        return !baskets.isEmpty();
     }
 }

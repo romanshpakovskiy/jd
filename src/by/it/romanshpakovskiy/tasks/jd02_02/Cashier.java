@@ -36,16 +36,21 @@ public class Cashier extends Thread {
         }
     }
 
-    synchronized void wake() {
+    void wake() {
         synchronized (this) {
-            waiting = false;
-            notify();
+            if(isWaiting()) {
+                waiting = false;
+                notify();
+                if (!Runner.AS_A_TABLE) System.out.println(this + " started working");
+            }
         }
     }
 
-    private synchronized void serve(Buyer buyer, int lineSize) {
-        synchronized (this) {
-            check(this, buyer, lineSize);
+    private void serve(Buyer buyer, int lineSize) {
+        if (!Runner.AS_A_TABLE) System.out.println(this + " serves " + buyer.toString());
+        check(this, buyer, lineSize);
+        buyer.sleepBuyer(2000, 5000);
+        synchronized (buyer) {
             buyer.notify();
         }
     }
@@ -53,16 +58,16 @@ public class Cashier extends Thread {
     synchronized void closeCashier() {
         endOfWork = true;
         interrupt();
+        if(!Runner.AS_A_TABLE) System.out.println(this + " closed");
     }
 
     @Override
     public void run() {
-        Buyer buyer = store.getBuyer();
         while (!endOfWork) {
+            Buyer buyer = store.getBuyer();
             if (buyer != null)
                 serve(buyer, store.getBuyersQueueSize());
-            else
-                pause();
+            else pause();
         }
     }
 

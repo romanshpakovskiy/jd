@@ -3,7 +3,7 @@ package by.it.romanshpakovskiy.tasks.jd02_02;
 import java.util.*;
 
 public class Basket {
-    LinkedList<String> goods;
+    private LinkedList<String> goods;
 
     public Basket() {
         goods = new LinkedList<>();
@@ -13,7 +13,7 @@ public class Basket {
         goods.add(prod);
     }
 
-    String getProd(){
+    public String getProd(){
         return goods.pollFirst();
     }
 }
