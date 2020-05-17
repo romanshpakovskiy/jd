@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Buyer extends Thread implements IBuyer, IUseBasket {
-    int buyerNum;
     boolean pensioneer;
     private final Store store;
-    Basket basket;
-    List<String> product;
+    private Basket basket;
+    private List<String> product;
 
     Buyer(Store store, int buyerNum) {
-        this.buyerNum = buyerNum;
         this.setName("Buyer №" + buyerNum + " ");
         this.store = store;
         product = new ArrayList<>();
@@ -44,48 +42,47 @@ public class Buyer extends Thread implements IBuyer, IUseBasket {
     @Override
     public boolean enterToTheMarket() {
         int actualBuyersCount = store.enterTheStore(this);
-        if(actualBuyersCount>=0) {
+        if (actualBuyersCount >= 0) {
             if (!Runner.AS_A_TABLE) System.out.println(this + " entered the store");
             return true;
-        }
-        else {
-            if(!Runner.AS_A_TABLE) System.out.println(this + " didn't visit the store");
+        } else {
+            if (!Runner.AS_A_TABLE) System.out.println(this + " didn't visit the store");
             return false;
         }
     }
 
     @Override
     public void takeBasket() {
-        if(!Runner.AS_A_TABLE) System.out.println(this + " waits for basket");
+        if (!Runner.AS_A_TABLE) System.out.println(this + " waits for basket");
         while (true) {
             basket = store.getBasket();
-            if(basket != null){
+            if (basket != null) {
                 break;
             }
             Thread.yield();
         }
-        if(!Runner.AS_A_TABLE) System.out.println(this + " took basket");
+        if (!Runner.AS_A_TABLE) System.out.println(this + " took basket");
         sleepBuyer(500, 2000);
     }
 
     @Override
     public void chooseGoods() {
         int basketGoods = Helper.getRandomValue(1, 4);
-        if(!Runner.AS_A_TABLE) System.out.println(this + " started choosing of goods");
+        if (!Runner.AS_A_TABLE) System.out.println(this + " started choosing of goods");
         for (int i = 0; i < basketGoods; i++) {
             product.add(store.getRandomGoods());
-            sleepBuyer(500, 2000);
+            sleepBuyer(125, 500);
         }
-        if(!Runner.AS_A_TABLE) System.out.println(this + " finished choosing of goods");
+        if (!Runner.AS_A_TABLE) System.out.println(this + " finished choosing of goods");
     }
 
     @Override
     public void putGoodsToTheBasket() {
         for (String s : product) {
             basket.putGoods(s);
-            sleepBuyer(500, 2000);
+            sleepBuyer(125, 500);
         }
-        if(!Runner.AS_A_TABLE) System.out.println(this + " put" + product + " at basket");
+        if (!Runner.AS_A_TABLE) System.out.println(this + " put" + product + " at basket");
     }
 
     @Override

@@ -6,32 +6,26 @@ public class BuyersQueue {
     private ArrayDeque<Buyer> youngGeneration;
     private ArrayDeque<Buyer> oldGeneration;
 
-    BuyersQueue(){
+    BuyersQueue() {
         youngGeneration = new ArrayDeque<>();
         oldGeneration = new ArrayDeque<>();
     }
 
-    void enterQueue(Buyer buyer) {
-        synchronized (this) {
-            if (buyer.isPensioner())
-                oldGeneration.add(buyer);
-            else
-                youngGeneration.add(buyer);
-        }
+    synchronized void enterQueue(Buyer buyer) {
+        if (buyer.isPensioner())
+            oldGeneration.add(buyer);
+        else
+            youngGeneration.add(buyer);
     }
 
-    Buyer nextBuyer() {
-        synchronized (this) {
-            if (!oldGeneration.isEmpty())
-                return oldGeneration.pollFirst();
-            else
-                return youngGeneration.pollFirst();
-        }
+    synchronized Buyer nextBuyer() {
+        if (!oldGeneration.isEmpty())
+            return oldGeneration.pollFirst();
+        else
+            return youngGeneration.pollFirst();
     }
 
-    int getSize() {
-        synchronized (this) {
-            return youngGeneration.size() + oldGeneration.size();
-        }
+    synchronized int getSize() {
+        return youngGeneration.size() + oldGeneration.size();
     }
 }

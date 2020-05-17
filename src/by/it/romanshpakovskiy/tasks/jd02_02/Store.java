@@ -3,25 +3,25 @@ package by.it.romanshpakovskiy.tasks.jd02_02;
 import java.util.*;
 
 public class Store {
+    List<Cashier> cashiers;
     private final Map<String, Double> goods;
-    private List<Cashier> cashiers;
     boolean isClose;
     private Set<Buyer> buyers;
     private LinkedList<Basket> baskets;
     final Manager manager;
-    private BuyersQueue buyersQueue;
+    BuyersQueue buyersQueue;
 
     public Store(int countOfTheBasket) {
         manager = new Manager(this);
         buyers = new HashSet<>();
         baskets = new LinkedList<>();
         buyersQueue = new BuyersQueue();
+        cashiers = new ArrayList<>();
 
         for (int i = 0; i < countOfTheBasket; i++) {
             baskets.add(new Basket());
         }
 
-        cashiers = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             cashiers.add(new Cashier(this, i + 1));
         }
@@ -37,14 +37,14 @@ public class Store {
         goods.put("banana", 3.2);
     }
 
-    Buyer getBuyer(){
+    synchronized Buyer getBuyer() {
         return buyersQueue.nextBuyer();
     }
 
     synchronized Basket getBasket() {
         if (!baskets.isEmpty()) {
             Basket basket = baskets.iterator().next();
-            if(basket!=null){
+            if (basket != null) {
                 baskets.remove(basket);
                 return basket;
             }
@@ -67,9 +67,9 @@ public class Store {
         return 0;
     }
 
-    synchronized void enterBuyersQueue(Buyer buyer){
-        if(!manager.isWork()){
-            synchronized (manager){
+    void enterBuyersQueue(Buyer buyer) {
+        if (!manager.isWork()) {
+            synchronized (manager) {
                 manager.notify();
             }
         }
@@ -87,7 +87,7 @@ public class Store {
         buyers.remove(buyer);
     }
 
-    int getBuyersQueueSize(){
+    int getBuyersQueueSize() {
         return buyersQueue.getSize();
     }
 
@@ -102,7 +102,7 @@ public class Store {
         }
     }
 
-    synchronized void putBasketBack(Basket basket){
+    synchronized void putBasketBack(Basket basket) {
         baskets.add(basket);
     }
 

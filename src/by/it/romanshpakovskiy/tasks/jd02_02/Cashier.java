@@ -16,7 +16,7 @@ public class Cashier extends Thread {
     Cashier(Store store, int number) {
         this.store = store;
         this.number = number;
-        name = "Cashier-" + number;
+        name = "Cashier №" + number;
         Thread thread = new Thread(this, name);
         thread.start();
     }
@@ -27,7 +27,7 @@ public class Cashier extends Thread {
 
     private synchronized void pause() {
         waiting = true;
-        if (isWaiting()) {
+        if (!isWaiting()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -36,13 +36,11 @@ public class Cashier extends Thread {
         }
     }
 
-    void wake() {
-        synchronized (this) {
-            if(isWaiting()) {
-                waiting = false;
-                notify();
-                if (!Runner.AS_A_TABLE) System.out.println(this + " started working");
-            }
+    synchronized void wake() {
+        if (isWaiting()) {
+            waiting = false;
+            notify();
+            if (!Runner.AS_A_TABLE) System.out.println(this + " started working");
         }
     }
 
@@ -51,14 +49,14 @@ public class Cashier extends Thread {
         check(this, buyer, lineSize);
         buyer.sleepBuyer(2000, 5000);
         synchronized (buyer) {
-            buyer.notify();
+            notify();
         }
     }
 
     synchronized void closeCashier() {
         endOfWork = true;
-        interrupt();
-        if(!Runner.AS_A_TABLE) System.out.println(this + " closed");
+        notify();
+        if (!Runner.AS_A_TABLE) System.out.println(this + " closed");
     }
 
     @Override
@@ -126,5 +124,4 @@ public class Cashier extends Thread {
             inTable.forEach(System.out::println);
         }
     }
-    
 }

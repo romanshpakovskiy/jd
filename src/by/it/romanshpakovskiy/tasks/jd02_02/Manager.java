@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Manager extends Thread {
-    List<Cashier> cashiers;
     Store store;
     private boolean endWork;
     private boolean work;
@@ -15,7 +14,7 @@ public class Manager extends Thread {
         thread.start();
     }
 
-    boolean isWork(){
+    boolean isWork() {
         return work;
     }
 
@@ -31,9 +30,10 @@ public class Manager extends Thread {
 
             while (!endWork) {
                 cashiersManaging();
-                if(store.isClose){
-                   store.closeTheStore();
-                   endWork = true;
+                if (store.isClose) {
+                    store.closeTheStore();
+                    endWork = true;
+                    break;
                 }
             }
         }
@@ -54,7 +54,7 @@ public class Manager extends Thread {
     void cashiersManaging() {
         int workingCashiers = 0;
         ArrayList<String> workingCashiersNames = new ArrayList<>();
-        for (Cashier cashier : cashiers) {
+        for (Cashier cashier : store.cashiers) {
             if (!cashier.isWaiting()) {
                 workingCashiersNames.add(cashier.toString());
                 workingCashiers++;
@@ -64,7 +64,7 @@ public class Manager extends Thread {
         int actualQueueSize = store.getBuyersQueueSize();
         if (necessaryCashiers(actualQueueSize) > workingCashiers) {
             while (necessaryCashiers(actualQueueSize) <= workingCashiers) {
-                for (Cashier cashier : cashiers) {
+                for (Cashier cashier : store.cashiers) {
                     for (String cashiersName : workingCashiersNames) {
                         if (!cashier.toString().equals(cashiersName))
                             cashier.wake();
