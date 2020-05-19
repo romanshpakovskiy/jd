@@ -1,7 +1,6 @@
 package by.it.romanshpakovskiy.tasks.jd02_02;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Manager extends Thread {
     Store store;
@@ -10,8 +9,8 @@ public class Manager extends Thread {
 
     Manager(Store store) {
         this.store = store;
-        Thread thread = new Thread("Store Manager");
-        thread.start();
+        this.setName("Manager");
+        start();
     }
 
     boolean isWork() {
@@ -30,12 +29,12 @@ public class Manager extends Thread {
 
             while (!endWork) {
                 cashiersManaging();
-                if (store.isClose) {
+                if (store.close()) {
                     store.closeTheStore();
-                    endWork = true;
                     break;
                 }
             }
+            endWork = true;
         }
     }
 

@@ -4,12 +4,12 @@ import java.util.*;
 
 public class Store {
     List<Cashier> cashiers;
-    private final Map<String, Double> goods;
     boolean isClose;
-    private Set<Buyer> buyers;
-    private LinkedList<Basket> baskets;
+    private final Set<Buyer> buyers;
+    private final LinkedList<Basket> baskets;
     final Manager manager;
     BuyersQueue buyersQueue;
+    Product product;
 
     public Store(int countOfTheBasket) {
         manager = new Manager(this);
@@ -26,15 +26,11 @@ public class Store {
             cashiers.add(new Cashier(this, i + 1));
         }
 
-        goods = new HashMap<>();
-        goods.put("potato", 3.0);
-        goods.put("salad", 3.5);
-        goods.put("pasta", 2.5);
-        goods.put("tomato", 3.5);
-        goods.put("cucumber", 1.5);
-        goods.put("carrot", 2.8);
-        goods.put("milk", 2.3);
-        goods.put("banana", 3.2);
+        product = new Product();
+    }
+
+    String getProduct() {
+        return product.getRandomGoods();
     }
 
     synchronized Buyer getBuyer() {
@@ -51,22 +47,7 @@ public class Store {
         }
         return null;
     }
-
-    public String getRandomGoods() {
-        List<String> keysList = new ArrayList<>(goods.keySet());
-        int randomKeys = new Random().nextInt(keysList.size());
-        return keysList.get(randomKeys);
-    }
-
-    public double getPrice(String product) {
-        for (Map.Entry<String, Double> entry : goods.entrySet()) {
-            if (entry.getKey().equals(product)) {
-                return entry.getValue();
-            }
-        }
-        return 0;
-    }
-
+    
     void enterBuyersQueue(Buyer buyer) {
         if (!manager.isWork()) {
             synchronized (manager) {
@@ -108,5 +89,9 @@ public class Store {
 
     synchronized boolean isBasket() {
         return !baskets.isEmpty();
+    }
+
+    public boolean close() {
+        return buyers.size() == 0;
     }
 }

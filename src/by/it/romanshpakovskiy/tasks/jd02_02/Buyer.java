@@ -7,7 +7,7 @@ public class Buyer extends Thread implements IBuyer, IUseBasket {
     boolean pensioneer;
     private final Store store;
     private Basket basket;
-    private List<String> product;
+    private final List<String> product;
 
     Buyer(Store store, int buyerNum) {
         this.setName("Buyer №" + buyerNum + " ");
@@ -30,7 +30,7 @@ public class Buyer extends Thread implements IBuyer, IUseBasket {
 
     @Override
     public void run() {
-        while (enterToTheMarket()) {
+        if (enterToTheMarket()) {
             takeBasket();
             chooseGoods();
             putGoodsToTheBasket();
@@ -70,7 +70,7 @@ public class Buyer extends Thread implements IBuyer, IUseBasket {
         int basketGoods = Helper.getRandomValue(1, 4);
         if (!Runner.AS_A_TABLE) System.out.println(this + " started choosing of goods");
         for (int i = 0; i < basketGoods; i++) {
-            product.add(store.getRandomGoods());
+            product.add(store.getProduct());
             sleepBuyer(125, 500);
         }
         if (!Runner.AS_A_TABLE) System.out.println(this + " finished choosing of goods");
@@ -110,6 +110,7 @@ public class Buyer extends Thread implements IBuyer, IUseBasket {
         store.putBasketBack(basket);
         store.leaveStore(this);
         if (!Runner.AS_A_TABLE) System.out.println(this + " gone");
+        interrupt();
     }
 
     @Override

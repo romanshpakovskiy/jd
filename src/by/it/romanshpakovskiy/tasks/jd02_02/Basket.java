@@ -13,7 +13,7 @@ public class Basket {
         goods.add(prod);
     }
 
-    public String getProd(){
+    public String getProd() {
         return goods.pollFirst();
     }
 }

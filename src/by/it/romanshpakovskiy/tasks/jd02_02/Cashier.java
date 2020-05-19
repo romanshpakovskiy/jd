@@ -49,7 +49,7 @@ public class Cashier extends Thread {
         check(this, buyer, lineSize);
         buyer.sleepBuyer(2000, 5000);
         synchronized (buyer) {
-            notify();
+            buyer.notify();
         }
     }
 
@@ -80,17 +80,10 @@ public class Cashier extends Thread {
         return name;
     }
 
-    static String tableMarkUp(String product, Double price, Cashier cashier, int lineSize) {
-        StringBuilder sb = new StringBuilder();
+    String tableMarkUp(String product, Double price, Cashier cashier, int lineSize) {
         String emptyColumn = "                              ";
         String upLine = "┌-----------------------------";
-        sb.append(upLine.repeat(COLUMN_COUNT)).append("┐\n");
-        sb.append("|");
-        for (int i = 0; i < 5; i++) {
-            sb.append(String.format("%18s%d%11s", "Cashier №", i + 1, "|"));
-        }
-        sb.append(String.format("%19s%11s", "queue size", "|"));
-        sb.append(String.format("%19s%11s", "Total sum", "|")).append("\n");
+        StringBuilder sb = new StringBuilder();
         sb.append(upLine.repeat(COLUMN_COUNT)).append("┐\n|");
         for (int i = 0; i < MAX_CASHIERS; i++) {
             if (i == cashier.getNumber()) {
@@ -110,7 +103,7 @@ public class Cashier extends Thread {
         List<String> inTable = new ArrayList<>();
         double totalSum = 0;
         while (prod != null) {
-            double price = store.getPrice(prod);
+            double price = store.product.getPrice(prod);
             if (Runner.AS_A_TABLE) {
                 inTable.add(tableMarkUp(prod, price, cashier, lineSize));
             }
