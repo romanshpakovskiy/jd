@@ -3,13 +3,16 @@ package by.it.romanshpakovskiy.tasks.jd02_02;
 import java.util.*;
 
 public class Store {
-    List<Cashier> cashiers;
-    boolean isClose;
-    private final Set<Buyer> buyers;
-    private final LinkedList<Basket> baskets;
+    private List<Cashier> cashiers;
+    private final Map<String, Double> goods;
+    boolean isClosed;
+    private Set<Buyer> buyers;
+    private LinkedList<Basket> baskets;
     final Manager manager;
+    static final int CASHIERS_COUNT = 5;
     BuyersQueue buyersQueue;
-    Product product;
+    private double revenue;
+    private int totalBuyersCount;
 
     public Store(int countOfTheBasket) {
         manager = new Manager(this);
@@ -22,15 +25,35 @@ public class Store {
             baskets.add(new Basket());
         }
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < CASHIERS_COUNT; i++) {
             cashiers.add(new Cashier(this, i + 1));
         }
 
-        product = new Product();
+        goods = new HashMap<>();
+        goods.put("potato", 3.0);
+        goods.put("salad", 3.5);
+        goods.put("pasta", 2.5);
+        goods.put("tomato", 3.5);
+        goods.put("cucumber", 1.5);
+        goods.put("carrot", 2.8);
+        goods.put("milk", 2.3);
+        goods.put("banana", 3.2);
     }
 
-    String getProduct() {
-        return product.getRandomGoods();
+    public List<Cashier> getCashiers() {
+        return cashiers;
+    }
+
+    int getTotalBuyersCount() {
+        return totalBuyersCount;
+    }
+
+    public double getRevenue() {
+        return revenue;
+    }
+
+    synchronized double setRevenue(double revenue) {
+        return this.revenue += revenue;
     }
 
     synchronized Buyer getBuyer() {
@@ -39,16 +62,30 @@ public class Store {
 
     synchronized Basket getBasket() {
         if (!baskets.isEmpty()) {
-            Basket basket = baskets.iterator().next();
-            if (basket != null) {
-                baskets.remove(basket);
-                return basket;
-            }
+            return baskets.pollFirst();
         }
         return null;
     }
-    
-    void enterBuyersQueue(Buyer buyer) {
+
+    public String getRandomGoods() {
+        int num = Helper.getRandomValue(0, goods.size() - 1);
+        Iterator<String> it = goods.keySet().iterator();
+        for (int i = 0; i < num; i++) {
+            it.next();
+        }
+        return it.next();
+    }
+
+    public double getPrice(String product) {
+        for (Map.Entry<String, Double> entry : goods.entrySet()) {
+            if (entry.getKey().equals(product)) {
+                return entry.getValue();
+            }
+        }
+        return 0;
+    }
+
+    synchronized void enterBuyersQueue(Buyer buyer) {
         if (!manager.isWork()) {
             synchronized (manager) {
                 manager.notify();
@@ -58,10 +95,15 @@ public class Store {
     }
 
     synchronized int enterTheStore(Buyer buyer) {
-        if (!isClose) {
+        if (!isClosed) {
             buyers.add(buyer);
+            totalBuyersCount++;
             return buyers.size();
         } else return -1;
+    }
+
+    public synchronized int buyersCount() {
+        return buyers.size();
     }
 
     synchronized void leaveStore(Buyer buyer) {
@@ -73,14 +115,17 @@ public class Store {
     }
 
     void closeTheStore() {
-        for (Cashier cashier : cashiers) {
+        cashiers.forEach(cashier -> {
+            Thread thread = cashier.getThread();
             try {
-                cashier.join(30);
+                while (thread.isAlive()) {
+                    thread.join(10);
+                    cashier.closeCashier();
+                }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.err.println("InterruptedException " + e.getMessage());
             }
-            cashier.closeCashier();
-        }
+        });
     }
 
     synchronized void putBasketBack(Basket basket) {
@@ -91,7 +136,12 @@ public class Store {
         return !baskets.isEmpty();
     }
 
-    public boolean close() {
-        return buyers.size() == 0;
+    boolean closed() {
+        if (buyers.size() == 0) {
+            isClosed = true;
+            return true;
+        }
+        return false;
     }
+
 }

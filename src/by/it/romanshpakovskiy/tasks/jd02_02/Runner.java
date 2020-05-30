@@ -1,29 +1,29 @@
 package by.it.romanshpakovskiy.tasks.jd02_02;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.LinkedList;
 
 public class Runner {
     static int countOfBuyers = 0;
-    static final boolean AS_A_TABLE = false;
-    static final int buyersLimit = 20;
+    static final boolean AS_A_TABLE = true;
+    static final int CHAR_IN_COLUMN = 23;
+    static final String EMPTY_COL = "                                           ".
+            substring(0, CHAR_IN_COLUMN);
 
     public static void main(String[] args) {
-        Queue<Buyer> buyers = new ArrayDeque<>();
-        Store store = new Store(20);
-
-        for (int sec = 0; sec < 120; sec++) {
-            int k = getCountOfBuyersPerTime(sec);
-            while (countOfBuyers < k && store.isBasket() && countOfBuyers < buyersLimit) {
+        LinkedList<Buyer> buyers = new LinkedList<>();
+        Store store = new Store(50);
+        for (int second = 1; countOfBuyers < 120; second++) {
+            int c = getCountOfBuyersPerTime(second);
+            while (store.buyersCount() < c && store.isBasket() && countOfBuyers < 120) {
                 buyers.add(new Buyer(store, ++countOfBuyers));
             }
+            Helper.sleep(1000);
         }
-
         buyers.forEach(buyer -> {
             try {
                 buyer.join();
             } catch (InterruptedException e) {
-                System.err.println("InterruptedException " + e.getMessage());
+                e.printStackTrace();
             }
         });
     }

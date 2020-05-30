@@ -12,7 +12,7 @@ public class BuyersQueue {
     }
 
     synchronized void enterQueue(Buyer buyer) {
-        if (buyer.isPensioner())
+        if (buyer.isPensioneer())
             oldGeneration.add(buyer);
         else
             youngGeneration.add(buyer);
