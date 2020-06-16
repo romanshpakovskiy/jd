@@ -7,15 +7,11 @@ class Scalar extends Var {
         return value;
     }
 
-    Scalar(double value){
+    Scalar(double value) {
         this.value = value;
     }
 
-    Scalar(Scalar scalar){
-        this.value = scalar.value;
-    }
-
-    Scalar(String strScalar){
+    Scalar(String strScalar) {
         this.value = Double.parseDouble(strScalar);
     }
 
@@ -26,33 +22,104 @@ class Scalar extends Var {
 
     @Override
     public Var add(Var other) {
-        if(other instanceof Scalar){
-            double sum = this.value + ((Scalar) other).value;
-            return new Scalar(sum);
-        } else return other.add(this);
+        return other.add(this);
+    }
+
+    @Override
+    public Var add(Scalar other) {
+        double sum = this.value + other.value;
+        return new Scalar(sum);
+    }
+
+    @Override
+    public Var add(Vector other) {
+        return other.add(this);
+    }
+
+    @Override
+    public Var add(Matrix other) {
+        return other.add(this);
     }
 
     @Override
     public Var sub(Var other) {
-        if(other instanceof Scalar){
-            double sub = this.value - ((Scalar) other).value;
-            return new Scalar(sub);
-        } else return new Scalar(-1).mul(other).add(this);
+        return other.sub(this);
+    }
+
+    @Override
+    public Var sub(Scalar other) {
+        double sub = this.value - other.value;
+        return new Scalar(sub);
+    }
+
+    @Override
+    public Var sub(Vector other) {
+        Var minusScalar = new Scalar(this.value * -1);
+        return other.add(minusScalar);
+    }
+
+    @Override
+    public Var sub(Matrix other) {
+        double[][] otherValue = other.getValue();
+        double[][] returnMatrix = new double[otherValue.length][otherValue[0].length];
+        for (int y = 0; y < otherValue.length; y++) {
+            for (int x = 0; x < otherValue.length; x++) {
+                returnMatrix[x][y] = otherValue[x][y] - this.value;
+            }
+        }
+        return new Matrix(returnMatrix);
     }
 
     @Override
     public Var mul(Var other) {
-        if(other instanceof Scalar){
-            double mul = this.value * ((Scalar) other).value;
-            return new Scalar(mul);
-        } else return other.mul(this);
+        return other.mul(this);
     }
 
     @Override
-    public Var div(Var other) {
-        if(other instanceof Scalar){
-            double div = this.value / ((Scalar) other).value;
-            return new Scalar(div);
-        } else return super.div(other);
+    public Var mul(Scalar other) {
+        double mul = this.value * other.value;
+        return new Scalar(mul);
+    }
+
+    @Override
+    public Var mul(Vector other) {
+        return other.mul(this);
+    }
+
+    @Override
+    public Var mul(Matrix other) {
+        return other.mul(this);
+    }
+
+    @Override
+    public Var div(Var other) throws CalcException {
+        return other.div(this);
+    }
+
+    @Override
+    public Var div(Scalar other) throws CalcException {
+        if (this.value == 0) {
+            throw new CalcException("Incertitude!");
+        }
+        Var sclr = new Scalar(1 / this.value);
+        return other.mul(sclr);
+    }
+
+    @Override
+    public Var div(Vector other) throws CalcException {
+        if (this.value == 0) {
+            throw new CalcException("Incertitude!");
+        }
+        Var sclr = new Scalar(1 / this.value);
+        return other.mul(sclr);
+    }
+
+    @Override
+    public Var div(Matrix other) throws CalcException {
+        if (this.value == 0) {
+            throw new CalcException("Incertitude!");
+        }
+        Var sclr = new Scalar(1 / this.value);
+        return other.mul(sclr);
     }
 }

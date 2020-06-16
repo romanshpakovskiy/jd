@@ -20,23 +20,47 @@ abstract class Var implements Operation {
         return null;
     }
 
-    public Var add(Var other){
+    public Var add(Var other) throws CalcException {
         System.out.println("Sum operation " + this + "+" + other + " unreal");
         return null;
     }
+
+    public abstract Var add(Vector other);
+
+    public abstract Var add(Scalar other);
+
+    public abstract Var add(Matrix other);
 
     public Var sub(Var other){
         System.out.println("Sub operation " + this + "-" + other + " unreal");
         return null;
     }
 
+    public abstract Var sub(Vector other);
+
+    public abstract Var sub(Scalar other);
+
+    public abstract Var sub(Matrix leftOperand);
+
     public Var mul(Var other){
         System.out.println("Mul operation " + this + "*" + other + " unreal");
         return null;
     }
 
-    public Var div(Var other){
+    public abstract Var mul(Vector other);
+
+    public abstract Var mul(Scalar other);
+
+    public abstract Var mul(Matrix other);
+
+    public Var div(Var other) throws CalcException {
         System.out.println("Div operation " + this + "/" + other + " unreal");
         return null;
     }
+
+    public abstract Var div(Scalar other) throws CalcException;
+
+    public abstract Var div(Vector other) throws CalcException;
+
+    public abstract Var div(Matrix other) throws CalcException;
 }
