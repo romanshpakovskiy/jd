@@ -1,66 +1,107 @@
 package by.it.romanshpakovskiy.tasks.jd02_04;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 abstract class Var implements Operation {
-    static Var createVar(String operand){
-        operand = operand.trim().replace("\\s+", "");
-        if(operand.matches((Patterns.Scalar))){
+    private static Map<String, Var> varMap = new HashMap<>();
+
+    static Var createVar(String operand) throws CalcException {
+        if (operand.matches((Patterns.Scalar)))
             return new Scalar(operand);
-        }
-
-        if(operand.matches((Patterns.Vector))){
+        else if (operand.matches((Patterns.Vector)))
             return new Vector(operand);
-        }
-
-        if(operand.matches((Patterns.Matrix))){
+        else if (operand.matches((Patterns.Matrix)))
             return new Matrix(operand);
+        else if (varMap.containsKey(operand))
+            return varMap.get(operand);
+        throw new CalcException("Unknown operand: " + operand);
+    }
+
+    static void saveVar(String key, Var var) {
+        varMap.put(key, var);
+        try {
+            saveVarToFile();
+        } catch (CalcException e) {
+            e.printStackTrace();
         }
+    }
+
+    static void saveVarToFile() throws CalcException {
+        try (PrintWriter writer = new PrintWriter("src/by/it/romanshpakovskiy/tasks/jd02_04/vars.txt")) {
+            varMap.forEach((key, value) -> writer.printf("%s=%s\n", key, value));
+        } catch (FileNotFoundException e) {
+            throw new CalcException(e);
+        }
+    }
+
+    @Override
+    public Var add(Var rightOperand) throws CalcException {
         return null;
     }
 
-    public Var add(Var other) throws CalcException {
-        System.out.println("Sum operation " + this + "+" + other + " unreal");
+    public Var add(Scalar operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " + " + this + " impossible");
+    }
+
+    public Var add(Vector operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " + " + this + " impossible");
+    }
+
+    public Var add(Matrix operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " + " + this + " impossible");
+    }
+
+    @Override
+    public Var sub(Var operand) throws CalcException {
+        throw new CalcException("Operation " + this + " - " + operand + " impossible");
+    }
+
+    public Var sub(Scalar operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " - " + this + " impossible");
+    }
+
+    public Var sub(Vector operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " - " + this + " impossible");
+    }
+
+    public Var sub(Matrix operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " - " + this + " impossible");
+    }
+
+    @Override
+    public Var mul(Var operand) throws CalcException {
         return null;
     }
 
-    public abstract Var add(Vector other);
+    public Var mul(Scalar operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " * " + this + " impossible");
+    }
 
-    public abstract Var add(Scalar other);
+    public Var mul(Vector operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " * " + this + " impossible");
+    }
 
-    public abstract Var add(Matrix other);
+    public Var mul(Matrix operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " * " + this + " impossible");
+    }
 
-    public Var sub(Var other){
-        System.out.println("Sub operation " + this + "-" + other + " unreal");
+    @Override
+    public Var div(Var operand) throws CalcException {
         return null;
     }
 
-    public abstract Var sub(Vector other);
-
-    public abstract Var sub(Scalar other);
-
-    public abstract Var sub(Matrix leftOperand);
-
-    public Var mul(Var other){
-        System.out.println("Mul operation " + this + "*" + other + " unreal");
-        return null;
+    public Var div(Scalar operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " / " + this + " impossible");
     }
 
-    public abstract Var mul(Vector other);
-
-    public abstract Var mul(Scalar other);
-
-    public abstract Var mul(Matrix other);
-
-    public Var div(Var other) throws CalcException {
-        System.out.println("Div operation " + this + "/" + other + " unreal");
-        return null;
+    public Var div(Vector operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " / " + this + " impossible");
     }
 
-    public abstract Var div(Scalar other) throws CalcException;
-
-    public abstract Var div(Vector other) throws CalcException;
-
-    public abstract Var div(Matrix other) throws CalcException;
+    public Var div(Matrix operand) throws CalcException {
+        throw new CalcException("Operation " + operand + " / " + this + " impossible");
+    }
 }
