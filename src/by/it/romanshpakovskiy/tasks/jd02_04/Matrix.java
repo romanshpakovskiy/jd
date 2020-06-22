@@ -14,6 +14,10 @@ class Matrix extends Var {
         }
     }
 
+    Matrix(Matrix matrix){
+        this.value = matrix.value;
+    }
+
     Matrix(String strMatrix) {
         strMatrix = strMatrix.replaceAll("[{|}]{2,}", "");
         String[] stringValue = strMatrix.split("[}][\\s]?,[\\s]?[{]");

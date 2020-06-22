@@ -1,5 +1,7 @@
 package by.it.romanshpakovskiy.tasks.jd02_04;
 
+import java.util.Arrays;
+
 class Scalar extends Var {
     private double value;
 
@@ -52,9 +54,12 @@ class Scalar extends Var {
     }
 
     @Override
-    public Var sub(Vector other) throws CalcException {
-        Var minusScalar = new Scalar(this.value * -1);
-        return other.add(minusScalar);
+    public Var sub(Vector other) {
+        double[] arr = Arrays.copyOf(other.getValue(), other.getValue().length);
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = arr[i] - value;
+        }
+        return new Vector(arr);
     }
 
     @Override

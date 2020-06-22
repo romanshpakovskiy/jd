@@ -9,6 +9,7 @@ abstract class Var implements Operation {
     private static Map<String, Var> varMap = new HashMap<>();
 
     static Var createVar(String operand) throws CalcException {
+        operand = operand.replaceAll(" ", "");
         if (operand.matches((Patterns.Scalar)))
             return new Scalar(operand);
         else if (operand.matches((Patterns.Vector)))

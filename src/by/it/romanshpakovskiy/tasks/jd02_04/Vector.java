@@ -1,6 +1,8 @@
 package by.it.romanshpakovskiy.tasks.jd02_04;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Vector extends Var {
     private double[] value;
@@ -12,16 +14,24 @@ class Vector extends Var {
         }
     }
 
+    Vector(Vector vector){
+        this.value = vector.value;
+    }
+
     public double[] getValue() {
         return value;
     }
 
     Vector(String strVector) {
-        strVector = strVector.replaceAll("[{|}]", "");
-        String[] strVal = strVector.split(",");
-        value = new double[strVal.length];
-        for (int i = 0; i < strVal.length; i++) {
-            value[i] = Double.parseDouble(strVal[i].trim());
+        Pattern pattern = Pattern.compile("\\{(.*)}");
+        Matcher matcher = pattern.matcher(strVector);
+        if (matcher.find()) {
+            String[] arr = matcher.group(1).replace(" ", "")
+                    .split(",");
+            value = new double[arr.length];
+            for (int i = 0; i < arr.length; i++) {
+                value[i] = Double.parseDouble(arr[i]);
+            }
         }
     }
 
@@ -52,30 +62,32 @@ class Vector extends Var {
     }
 
     @Override
-    public Var add(Vector other) {
+    public Var add(Vector other) throws CalcException {
         double[] resVector = Arrays.copyOf(value, value.length);
         if (this.value.length == other.getValue().length) {
             for (int i = 0; i < resVector.length; i++) {
                 resVector[i] += other.value[i];
             }
+            return new Vector(resVector);
         }
-        return new Vector(resVector);
+        return super.sub(other);
     }
 
     @Override
-    public Var sub(Var other) throws CalcException{
+    public Var sub(Var other) throws CalcException {
         return other.sub(this);
     }
 
     @Override
-    public Var sub(Vector other) {
-        double[] resVector = Arrays.copyOf(value, value.length);
+    public Var sub(Vector other) throws CalcException {
         if (this.value.length == other.getValue().length) {
+            double[] resVector = Arrays.copyOf(other.value, other.value.length);
             for (int i = 0; i < resVector.length; i++) {
-                resVector[i] -= other.value[i];
+                resVector[i] -= value[i];
             }
+            return new Vector(resVector);
         }
-        return new Vector(resVector);
+        return super.sub(other);
     }
 
     @Override
@@ -88,7 +100,7 @@ class Vector extends Var {
     }
 
     @Override
-    public Var mul(Var other) throws CalcException{
+    public Var mul(Var other) throws CalcException {
         return other.mul(this);
     }
 
