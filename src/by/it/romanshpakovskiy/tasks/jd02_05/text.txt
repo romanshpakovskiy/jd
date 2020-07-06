@@ -1,0 +1,17 @@
+saveToFileError=Error save to file
+readingFileError=Error reading file
+loadingDataError=Error loading data
+incorrectArraySize=Incorrect array size
+incorrectValue=Incorrect value
+divisionByZero=Division by zero
+impossible=Impossible
+addition=Addition
+subtraction=Subtraction
+multiply=Multiply
+division=Division
+impossibleToCreate=Impossible to create
+incorrectVectorString=Wrong vector string
+recoveryOfTheVariableList=Recovery of the variable list
+saveToFile=Save to file
+printVar=Print var
+languageChanged=Language changed
